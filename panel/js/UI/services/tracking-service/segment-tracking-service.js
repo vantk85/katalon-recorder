@@ -3,7 +3,7 @@ import { getSelectedSuite } from "../../view/testcase-grid/selected-suite.js";
 
 function setUUID() {
     let d = new Date().getTime();
-    let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
@@ -12,6 +12,7 @@ function setUUID() {
 }
 
 function getLoggedInUserAPI() {
+    return Promise.resolve({});
     return fetch(`${getKatalonEndpoint()}wp-json/restful_api/v1/auth/me`)
         .then(response => response.json())
         .then(data => {
@@ -49,7 +50,7 @@ function trackingSegmentAPI(data) {
 
 function trackingSegment(event, action) {
     browser.storage.local.get('segment')
-        .then(async function(result) {
+        .then(async function (result) {
             if (!result.segment) {
                 result = {
                     segment: {
@@ -107,7 +108,7 @@ function trackingInstallApp() {
         event: "kru_install_application",
         properties: {}
     }
-    browser.storage.local.get('segment').then(async function(result) {
+    browser.storage.local.get('segment').then(async function (result) {
         if (!result.segment) {
             result = {
                 segment: {

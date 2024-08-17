@@ -175,7 +175,7 @@ input[type=email],input[type=password],input[type=text]{
 `;
 
 function togglerButton(data) {
-    $(".io-toggler").each(function() {
+    $(".io-toggler").each(function () {
         var io = $(this).data("io"),
             $opts = $(this).find(".io-options"),
             $clon = $opts.clone(),
@@ -200,15 +200,15 @@ function togglerButton(data) {
         $clon.draggable({
             axis: "x",
             containment: "parent",
-            drag: function(evt, ui) {
+            drag: function (evt, ui) {
                 $span.css({ left: -ui.position.left });
             },
-            stop: function(evt, ui) {
+            stop: function (evt, ui) {
                 swap(ui.position.left < width / 2 ? 0 : width);
             },
         });
 
-        $opts.on("click", function() {
+        $opts.on("click", function () {
             swap($clon.position().left > 0 ? 0 : width);
         });
 
@@ -224,7 +224,7 @@ function togglerButton(data) {
 
 function setUserLogin(rs, isLoggedIn) {
     if (isLoggedIn) {
-        browser.storage.local.get("checkLoginData").then(function(result) {
+        browser.storage.local.get("checkLoginData").then(function (result) {
             let checkLoginData = result.checkLoginData;
 
             if (rs.data.jwt) {
@@ -309,9 +309,9 @@ function getKatalonAPI() {
     return url;
 }
 
-const segmentTrackingService = async function() {
+const segmentTrackingService = async function () {
     const segmentSer = await
-    import ("../../panel/js/tracking/segment-tracking-service.js");
+        import("../../panel/js/tracking/segment-tracking-service.js");
     return segmentSer;
 };
 
@@ -324,12 +324,12 @@ const dialogSignIn = $('<div id="dialgue"></div>')
         height: 530,
         width: 450,
         modal: true,
-        open: function() {
+        open: function () {
             togglerButton(false);
             $("#signup").show();
             $("#signin").hide();
         },
-        close: function() {
+        close: function () {
             $(this).hide();
         },
         closeOnEscape: false
@@ -391,7 +391,7 @@ function setLoginOrSignup() {
 
             fetch(getKatalonAPI().signin, options)
                 .then((rp) => rp.json())
-                .then(async(rs) => {
+                .then(async (rs) => {
                     if (!rs.errors) {
                         rs.email = email;
                         await setUserLogin(rs, true);
@@ -432,7 +432,7 @@ function setLoginOrSignup() {
 
             fetch(getKatalonAPI().signup, options)
                 .then((rp) => rp.json())
-                .then(async(rs) => {
+                .then(async (rs) => {
                     if (!rs.error) {
                         segmentTrackingService().then((r) => r.trackingSignup());
                         _gaq.push(['_trackEvent', 'kru_registration', 'kru_sign_in']);
@@ -449,10 +449,10 @@ function setLoginOrSignup() {
         }
     });
 
-    $("#toggle-pass").on("click", function() {
+    $("#toggle-pass").on("click", function () {
         togglePassword(this);
     });
-    $("#toggle-pass1").on("click", function() {
+    $("#toggle-pass1").on("click", function () {
         togglePassword(this);
     });
 }
@@ -517,11 +517,11 @@ function popupCreateMoreTestCase() {
     }).html(dialogHTML);
     $("body").append(popup);
 
-    $("#createTestCase-later").click(function() {
+    $("#createTestCase-later").click(function () {
         $(popup).hide();
     });
 
-    $("#createTestCase-okay").click(function() {
+    $("#createTestCase-okay").click(function () {
         setLoginOrSignup();
         $(popup).hide();
     });
@@ -532,6 +532,7 @@ function popupCreateMoreTestCase() {
 
 
 export async function checkLoginOrSignupUser() {
+    return true;
     const createTestCaseThreshold = 1;
     let result = await browser.storage.local.get("checkLoginData");
     if (!result.checkLoginData) {
