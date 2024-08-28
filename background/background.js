@@ -25,7 +25,7 @@ function openPanel(tab) {
     if (master[contentWindowId] != undefined) {
         browser.windows.update(master[contentWindowId], {
             focused: true
-        }).catch(function(e) {
+        }).catch(function (e) {
             master[contentWindowId] == undefined;
             openPanel(tab);
         });
@@ -35,12 +35,12 @@ function openPanel(tab) {
     }
 
     clickEnabled = false;
-    setTimeout(function() {
+    setTimeout(function () {
         clickEnabled = true;
     }, 1000);
 
     // open GUI with specified size
-    var f = function(height, width, oldUI) {
+    var f = function (height, width, oldUI) {
         const url = oldUI ? "old-panel/index.html" : "panel/index.html"
         browser.windows.create({
             url: browser.runtime.getURL(url),
@@ -48,9 +48,9 @@ function openPanel(tab) {
             height: height,
             width: width
         }).then(function waitForPanelLoaded(panelWindowInfo) {
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 let count = 0;
-                let interval = setInterval(function() {
+                let interval = setInterval(function () {
                     if (count > 100) {
                         reject("SideeX editor has no response");
                         clearInterval(interval);
@@ -60,7 +60,7 @@ function openPanel(tab) {
                         active: true,
                         windowId: panelWindowInfo.id,
                         status: "complete"
-                    }).then(function(tabs) {
+                    }).then(function (tabs) {
                         if (tabs.length != 1) {
                             count++;
                             return;
@@ -75,13 +75,13 @@ function openPanel(tab) {
                     })
                 }, 500);
             });
-        }).then(function bridge(panelWindowInfo){
+        }).then(function bridge(panelWindowInfo) {
             popupWindowIDs.push(panelWindowInfo.id);
             return browser.tabs.sendMessage(panelWindowInfo.tabs[0].id, {
                 selfWindowId: panelWindowInfo.id,
                 commWindowId: contentWindowId
             });
-        }).catch(function(e) {
+        }).catch(function (e) {
             console.log(e);
         });
     };
@@ -89,13 +89,13 @@ function openPanel(tab) {
     // get previous window size, and open the window
 
     browser.storage.local.get("UIStyle").then(result => {
-        if (result.UIStyle === "old"){
+        if (result.UIStyle === "old") {
             getWindowSize(f, true);
         } else {
             getWindowSize(f, false);
         }
 
-    } )
+    })
 
 
 }
@@ -103,7 +103,7 @@ function openPanel(tab) {
 
 browser.browserAction.onClicked.addListener(openPanel);
 
-browser.windows.onRemoved.addListener(function(windowId) {
+browser.windows.onRemoved.addListener(function (windowId) {
     // if (popupWindowIDs.includes(windowId)){
     //     const index = popupWindowIDs.indexOf(windowId);
     //     popupWindowIDs.splice(index, 1);
@@ -121,7 +121,7 @@ browser.windows.onRemoved.addListener(function(windowId) {
 });
 
 async function segment() {
-    const segmentSer =  await import('../panel/js/UI/services/tracking-service/segment-tracking-service.js');
+    const segmentSer = await import('../panel/js/UI/services/tracking-service/segment-tracking-service.js');
     return segmentSer;
 }
 
@@ -233,10 +233,10 @@ function createKrMenus() {
 }
 
 var port;
-browser.contextMenus.onClicked.addListener(function(info, tab) {
+browser.contextMenus.onClicked.addListener(function (info, tab) {
     port.postMessage({ cmd: info.menuItemId });
 });
 
-browser.runtime.onConnect.addListener(function(m) {
+browser.runtime.onConnect.addListener(function (m) {
     port = m;
 });

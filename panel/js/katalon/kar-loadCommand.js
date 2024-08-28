@@ -8,7 +8,7 @@ function _loadSeleniumCommands() {
         //this.log.debug("func=" + func);
         var r;
         if (func.match(/^do[A-Z]/)) {
-            var action = func.substr(2,1).toLowerCase() + func.substr(3);
+            var action = func.substr(2, 1).toLowerCase() + func.substr(3);
             commands.push(action);
             if (!action.match(/^waitFor/) && nonWaitActions.indexOf(action) < 0) {
                 commands.push(action + "AndWait");
@@ -60,6 +60,8 @@ function _loadSeleniumCommands() {
     commands.push('label');
     commands.push('upload');
 
+    commands.push('comment');
+
     commands.sort();
 
     var uniqueCommands = [];
@@ -75,7 +77,7 @@ function _loadSeleniumCommands() {
 }
 
 // load Selenium IDE command reference
-$(function() {
+$(function () {
     $.ajax({
         url: 'js/katalon/selenium-ide/iedoc-core.xml',
         success: function (document) {
@@ -87,10 +89,10 @@ $(function() {
 });
 
 // get a command reference
-function scrape(word){
+function scrape(word) {
     emptyNode(document.getElementById("refercontainer"));
     var command = new Command(word);
     var def = command.getDefinition();
-    help_log.logHTML((def) ? def.getReferenceFor(command): '');
+    help_log.logHTML((def) ? def.getReferenceFor(command) : '');
     $('#tab4.case_roll').scrollTop(0);
 }
