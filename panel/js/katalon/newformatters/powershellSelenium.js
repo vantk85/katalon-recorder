@@ -12,24 +12,25 @@ $(document).ready(function () {
 
 const powershellSeleniumWebDriver = function (scriptName) {
   let _scriptName = scriptName || "";
+  const selectStr = "-By {ByType} -value '{ByValue}' -Timeout $DefaultTimeOut -ErrorAction Stop"
   const locatorType = {
     xpath: (target) => {
-      return `([OpenQA.Selenium.By]::XPath('${target.replace(/'/g, '"')}'))`;
+      return selectStr.replace('{ByType}', 'XPath').replace('{ByValue}', target).replace(/'/g, '"');
     },
     css: (target) => {
-      return `([OpenQA.Selenium.By]::CssSelector('${target.replace(/'/g, '"')}'))`;
+      return selectStr.replace('{ByType}', 'CssSelector').replace('{ByValue}', target).replace(/'/g, '"');
     },
     id: (target) => {
-      return `([OpenQA.Selenium.By]::Id('${target.replace(/'/g, '"')}'))`;
+      return selectStr.replace('{ByType}', 'Id').replace('{ByValue}', target).replace(/'/g, '"');
     },
     link: (target) => {
-      return `([OpenQA.Selenium.By]::LinkText('${target.replace(/'/g, '"')}'))`;
+      return selectStr.replace('{ByType}', 'LinkText').replace('{ByValue}', target).replace(/'/g, '"');
     },
     name: (target) => {
-      return `([OpenQA.Selenium.By]::Name('${target.replace(/'/g, '"')}'))`;
+      return selectStr.replace('{ByType}', 'Name').replace('{ByValue}', target).replace(/'/g, '"');
     },
     tag_name: (target) => {
-      return `'${target.replace(/"/g, "\'")}'`;
+      return selectStr.replace('{ByType}', 'TagName').replace('{ByValue}', target).replace(/'/g, '"');
     }
   };
 
@@ -55,49 +56,83 @@ const powershellSeleniumWebDriver = function (scriptName) {
   // katalon
   // https://docs.katalon.com/katalon-recorder/docs/selenese-selenium-ide-commands-reference.html
   const seleneseCommands = {
-    "open": "$GLobal:Selenium.Navigate().GoToUrl('_TARGET_')",
-    "click": "$el__STEP_ = Selenium-Click _BY_LOCATOR_",
-    "clickAndWait": "$el__STEP_ = Selenium-Click _BY_LOCATOR_",
-    "doubleClick": "$el__STEP_ = Selenium-DoubleClick _BY_LOCATOR_",
-    "doubleClickAndWait": "#wait\n$el__STEP_ = Selenium-DoubleClick _BY_LOCATOR_\n",
-    "type": "$el__STEP_ = Selenium-SetText _BY_LOCATOR_ '_VALUE_'",
-    "typeAndWait": "$el__STEP_ = Selenium-SendKeys _BY_LOCATOR_ '_VALUE_' # Wait",
-    "pause": "$GLobal:Selenium.Navigate().pause(_VALUE_)",
-    "refresh": "$GLobal:Selenium.Navigate().refresh()",
-    "sendKeys": "$el__STEP_ = Selenium-SendKeys _BY_LOCATOR_ _SEND_KEY_",
-    "sendKeysAndWait": "$el__STEP_ = Selenium-SendKeys _BY_LOCATOR_ '_SEND_KEY_' # '_VALUE_'",
+    "open": "Set-SeUrl '_TARGET_'",
+
+    "click": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeClick -Element $el__STEP_`,
+
+    "clickAndWait": `$el__STEP_ = Wait-SeElement _BY_LOCATOR_ -Condition ElementToBeClickable
+    $el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeClick -Element $el__STEP_`,
+
+    "doubleClick": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeClick -Element $el__STEP_ -Action DoubleClick`,
+
+    "doubleClickAndWait": `$el__STEP_ = Wait-SeElement _BY_LOCATOR_ -Condition ElementToBeClickable
+    $el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeClick -Element $el__STEP_ -Action DoubleClick`,
+
+    "type": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeKeys -Element $el__STEP_ -Keys '_VALUE_' -ClearFirst`,
+
+    "typeAndWait": `$el__STEP_ = Wait-SeElement _BY_LOCATOR_ -Condition ElementToBeClickable
+    $el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeKeys -Element $el__STEP_ -Keys '_VALUE_' -ClearFirst`,
+
+    "pause": "Start-Sleep -Seconds _VALUE_",
+    "refresh": "Set-SeUrl -Refresh",
+    "sendKeys": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeKeys -Element $el__STEP_ -Keys '_VALUE_'`,
+
+    "sendKeysAndWait": `$el__STEP_ = Wait-SeElement _BY_LOCATOR_ -Condition ElementToBeClickable
+    $el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeKeys -Element $el__STEP_ -Keys '_VALUE_'`,
+
     "select": "SelectBy-VisibleText _BY_LOCATOR_ '_SELECT_OPTION_'",
-    "goBack": "$GLobal:Selenium.Navigate().Back()",
-    "assertConfirmation": "$GLobal:Selenium.switchTo().alert().Accept()",
+    "goBack": "Set-SeUrl -Back",
+    "assertConfirmation": "Clear-SeAlert -Action Accept",
+    "_assertConfirmation": "Clear-SeAlert -Action Dismiss", // not yet
     "verifyText": "if(_BY_LOCATOR_).toHaveTextContaining(`_VALUE_STR_`);",
     "verifyTitle": "if(browser).toHaveTitle(`_VALUE_STR_`);",
     "verifyValue": "if(_BY_LOCATOR_).toHaveValueContaining(`_VALUE_STR_`)",
     "assertText": "if(_BY_LOCATOR_).toHaveTextContaining(`_VALUE_STR_`);",
     "assertTitle": "if(browser).toHaveTitle(`_VALUE_STR_`);",
     "assertValue": "if(_BY_LOCATOR_).toHaveValueContaining(`_VALUE_STR_`)",
-    "waitForAlertPresent":
-      "browser.waitUntil(function() {\n" +
-      "\t\t\treturn browser.getAlertText()\n" +
-      "\t\t})",
+    "waitForAlertPresent": "Wait-SeDriver -Condition AlertState -Value $true",
     "waitForElementPresent": "_BY_LOCATOR_.waitForExist();",
-    "waitForValue":
-      "$el__STEP_ = _BY_LOCATOR_;\n" +
-      "\t\tbrowser.waitUntil(() => el__STEP_.getValue() === `_VALUE_STR_`);",
-    "waitForNotValue":
-      "$el__STEP_ = _BY_LOCATOR_;\n" +
-      "\t\tbrowser.waitUntil(() => el__STEP_.getValue() !== `_VALUE_STR_`);",
-    "waitForVisible": "_BY_LOCATOR_.waitForDisplayed();",
-    "selectFrame": ""
+    "waitForValue": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    $el__STEP_ = Wait-SeElement -Element $el__STEP_ -Condition TextToBePresentInElementValue -ConditionValue '_VALUE_STR_'
+    if($el__STEP_) {
+      # True
+    }`,
+    "waitForNotValue": `# TODO: Not Work yet
+    $el__STEP_ = Get-SeElement _BY_LOCATOR_
+    $el__STEP_ = Wait-SeElement -Element $el__STEP_ -Condition TextToBePresentInElementValue -ConditionValue '_VALUE_STR_'
+    if(!$el__STEP_) {
+      # True
+    }`,
+
+    "storeText": "$_VALUE_STR_ = _BY_LOCATOR_",
+    "submit": `$el__STEP_ = Get-SeElement _BY_LOCATOR_
+    Invoke-SeKeys -Element $el__STEP_ -Submit`,
+
+    "comment": `# _BY_LOCATOR_ _VALUE_STR_`,
+    "waitForVisible": `$el__STEP_ = Wait-SeElement _BY_LOCATOR_ -Condition ElementIsVisible`
+    // "dragAndDrop": `# _BY_LOCATOR_ _VALUE_STR_`,
   };
 
-  const header =
-    "$ScriptPath = 'C:/Data/Projects/PowerShell/Demo'\n" +
-    "# Set-Location $ScriptPath'\n" +
-    "Import-Module './Modules/selenium-powershell/Selenium.psd1'\n\n" +
-    "# Start the Selenium Chrome Driver\n\n" +
-    "Start-SeDriver -Browser Chrome -StartURL 'https://google.com'\n";
+  const header = `Import-Module './Modules/selenium-powershell/Selenium.psd1'
+# Start the Selenium Chrome Driver
+$url = 'https://www.letmeread.net/'
+$downloadPath = 'C:/Data/Download'
+# $unpackedExtensionPath = 'C:/Data/Projects/Chrome/katalon-recorder'
+# $unpackedExtensionPath1 = 'C:/Users/vtang2/AppData/Local/Microsoft/Edge/User Data/Default/Extensions/odfafepnkmbhccpbejgmiehpchacaeak/1.59.0_0'
+$Options = New-SeDriverOptions -Browser Chrome -StartURL $url -State Maximized -DefaultDownloadPath $downloadPath
+# $Options.AddArgument('--load-extension=' + $unpackedExtensionPath + ',' + $unpackedExtensionPath1)
+Start-SeDriver -Options $Options
+`;
 
-  const footer = "\t});\n\n});";
+  const footer = ``;
 
   function formatter(commands) {
 
@@ -109,18 +144,34 @@ const powershellSeleniumWebDriver = function (scriptName) {
   function commandExports(commands) {
 
     return commands.reduce((accObj, commandObj) => {
+      if (typeof (accObj) == "undefined") {
+        accObj = { content: "" };
+      }
+
       let { command, target, value } = commandObj;
       let cmd = seleneseCommands[command];
       if (typeof (cmd) == "undefined") {
-        accObj.content += `\n\n\t// WARNING: unsupported command ${command}. Object= ${JSON.stringify(commandObj)}\n\n`;
+        if (command == "selectFrame") {
+          switch (target) {
+            case 'relative=parent':
+              accObj.content += `Switch-SeFrame -Parent\n`;
+              return accObj;
+            case 'relative=root':
+              accObj.content += `Switch-SeFrame -Root\n`;
+              return accObj;
+
+            default:
+              let frameIndex = target.trim().split("=", 2)[1];
+              accObj.content += `Switch-SeFrame -Frame ${frameIndex}\n`;
+              return accObj;
+          }
+        } else {
+          accObj.content += `\n\n\t// WARNING: unsupported command ${command}. Object= ${JSON.stringify(commandObj)}\n\n`;
+        }
         return accObj;
       }
 
       let funcStr = cmd;
-
-      if (typeof (accObj) == "undefined") {
-        accObj = { content: "" };
-      }
 
       let targetStr = target.trim().replace(/'/g, "\\'")
         .replace(/"/g, '\\"');
@@ -142,7 +193,7 @@ const powershellSeleniumWebDriver = function (scriptName) {
         .replace(/_SELECT_OPTION_/g, selectOption);
 
       accObj.step += 1;
-      accObj.content += `\t\t${funcStr}\n`
+      accObj.content += `${funcStr}\n`
 
       return accObj;
     }, { step: 1, content: "" });

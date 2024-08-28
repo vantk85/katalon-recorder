@@ -3,8 +3,8 @@ var _gaq = _gaq || []; // DO NOT REMOVE THIS LINE
 var manifestData = browser.runtime.getManifest();
 
 var katalonEndpoint = manifestData.homepage_url;
-var testOpsEndpoint = 'https://analytics.katalon.com';
-// var testOpsEndpoint = 'http://localhost:8444';
+// var testOpsEndpoint = 'https://analytics.katalon.com';
+var testOpsEndpoint = 'http://localhost:8444';
 var testOpsUrls = {
     getFirstProject: `${testOpsEndpoint}/api/v1/projects/first`,
     getUploadUrl: `${testOpsEndpoint}/api/v1/files/upload-url`,
@@ -25,7 +25,7 @@ this.log = console; // remove Selenium IDE Log
 
 
 // store window size upon resizing
-$(window).on('resize', function() {
+$(window).on('resize', function () {
     var data = {
         window: {
             width: window.outerWidth,
@@ -38,7 +38,7 @@ $(window).on('resize', function() {
 
 
 // modify and add handler for command grid toolbar buttons
-$(function() {
+$(function () {
 
     //move select and find buttons to the toolbar using js in order not to modify HTML
     // var pasteButton = $('#grid-paste-btn');
@@ -58,11 +58,11 @@ function addContextMenuButton(id, node, menu, type) {
     buttonWrapper.innerHTML = '<button class="btn-more"><img src="/katalon/images/SVG/more-icon.svg" alt="More" title="More"></button>';
     var button = buttonWrapper.firstChild;
     node.appendChild(button);
-    button.addEventListener("click", function(event) {
+    button.addEventListener("click", function (event) {
         event.stopPropagation();
         if (type === "case") {
             setSelectedCase(id);
-        } else if (type === "suite"){
+        } else if (type === "suite") {
             setSelectedSuite(id);
         }
         var mid = "#" + "menu" + id;
@@ -78,7 +78,7 @@ function addContextMenuButton(id, node, menu, type) {
 
 
 // KAT-BEGIN Show/hide bottom panel
-$(function() {
+$(function () {
     $('#show-hide-bottom-panel').click(function (e) {
         e.stopPropagation();
         var $bottomContent = $('#tab4');
@@ -99,7 +99,7 @@ $(function() {
 // KAT-END
 
 // KAT-BEGIN styling log/reference when clicked
-$(function() {
+$(function () {
     var logLi = $('#history-log');
     var referenceLi = $('#reference-log');
     var variableLi = $('#variable-log');
@@ -126,20 +126,20 @@ $(function() {
 
     setActiveTab(logLi, logContainer);
 
-    logLi.on("click", function() {
+    logLi.on("click", function () {
         setActiveTab(logLi, logContainer);
     });
-    referenceLi.on("click", function() {
+    referenceLi.on("click", function () {
         setActiveTab(referenceLi, referenceContainer);
     });
-    variableLi.on("click", function() {
+    variableLi.on("click", function () {
         setActiveTab(variableLi, variableContainer);
     });
-    screenshotLi.on("click", function() {
+    screenshotLi.on("click", function () {
         setActiveTab(screenshotLi, screenshotContainer);
     });
 
-    selfHealingLi.on('click', function (){
+    selfHealingLi.on('click', function () {
         setActiveTab(selfHealingLi, selfHealingContainer);
     })
 
@@ -168,7 +168,7 @@ $(function() {
             clearLog.hide();
             downloadAll.show();
             selfHealingSelect.hide();
-        }  else if (li == selfHealingLi){
+        } else if (li == selfHealingLi) {
             saveLog.hide();
             clearLog.hide();
             downloadAll.hide();
@@ -192,8 +192,8 @@ $(function() {
 // KAT-END
 var settingWindowID;
 // KAT-BEGIN handle click event for settings button
-$(function() {
-    function openPanel(){
+$(function () {
+    function openPanel() {
         let height = 740;
         let width = 820;
         browser.windows.create({
@@ -204,13 +204,13 @@ $(function() {
             focused: true,
         }).then(panel => settingWindowID = panel.id);
     }
-    $("#settings").on("click", function(){
-        if (settingWindowID === undefined){
+    $("#settings").on("click", function () {
+        if (settingWindowID === undefined) {
             openPanel();
-        } else{
+        } else {
             browser.windows.update(settingWindowID, {
                 focused: true
-            }).catch(function() {
+            }).catch(function () {
                 settingWindowID = undefined;
                 openPanel();
             });
@@ -220,7 +220,7 @@ $(function() {
 // KAT-END
 
 // KAT-BEGIN add tooltip for button
-$(function() {
+$(function () {
     $('#record').attr('title', "Click and navigate to the desired browser tab and record your tests. NOTE: If the tab has been opened before Katalon Recorder was installed, please refresh it.");
     $('#playback').attr('title', "Run selected test case on the active tab, any interference may stop the process. NOTE: If the tab has been opened before Katalon Recorder was installed, please refresh it.");
     $('#playSuite').attr('title', "Run selected test suite on the active tab, any interference may stop the process. NOTE: If the tab has been opened before Katalon Recorder was installed, please refresh it.");
@@ -282,7 +282,7 @@ $(function() {
 // })
 // KAT-END
 
-$(function() {
+$(function () {
     var slider = $('#slider');
     var sliderContainer = $('#slider-container');
     var speedButton = $('#speed');
@@ -299,7 +299,7 @@ $(function() {
     sliderContainer.append(slider);
     slider.show();
 
-    speedButton.on("click", function() {
+    speedButton.on("click", function () {
         sliderContainer.toggle();
     });
 })
@@ -328,8 +328,8 @@ function handleDisplayVariables() {
 // KAT-END
 
 // KAT-BEGIN add handler for button "New" click event
-$(function() {
-    $('#new').on('click', function() {
+$(function () {
+    $('#new').on('click', function () {
         saveOldCase();
         $('#add-testCase').click();
     });
@@ -337,7 +337,7 @@ $(function() {
 // KAT-END
 
 // KAT-BEGIN modify toolbar buttons
-$(function() {
+$(function () {
     // var record = $('#record');
     // var newCase = $('#new');
     // record.after(newCase);
@@ -398,12 +398,12 @@ $('#more').click(() => {
 });
 // KAT-END
 
-$(function() {
+$(function () {
     $(document).attr('title', 'Katalon Recorder ' + manifestData.version)
 });
 
 // KAT-BEGIN clear "Save" and "Clear" text
-$(function() {
+$(function () {
     var saveLog = $('#save-log a');
     var clearLog = $('#clear-log a');
 
@@ -424,8 +424,8 @@ function switchRecordButton(stop) {
 }
 
 // KAT-BEGIN disable event propagation when double clicking command toolbar fieldset
-$(function() {
-    $('#command-toolbar .fieldset').on("dblclick", function(event) {
+$(function () {
+    $('#command-toolbar .fieldset').on("dblclick", function (event) {
         event.stopPropagation();
     });
 })
@@ -474,16 +474,16 @@ function logEndTime() {
 
 
 // KAT-BEGIN handle event for help button click
-$(function() {
-    $('#help.sub_btn').on('click', function() {
-        $( "#helpDialog" ).dialog({
+$(function () {
+    $('#help.sub_btn').on('click', function () {
+        $("#helpDialog").dialog({
             autoOpen: false,
             modal: true,
             height: "auto",
             width: "584px",
             dialogClass: "help-dialog",
             draggable: false,
-            resize: function(event, ui) {
+            resize: function (event, ui) {
                 var size = ui.size;
                 var helpDialog = $('#helpDialog');
                 if (size.width <= 350) {
@@ -492,20 +492,20 @@ $(function() {
                     helpDialog.removeClass('small');
                 }
             },
-            open: function(event, ui) {
+            open: function (event, ui) {
                 $('.ui-widget-overlay').addClass("dim-overlay");
             },
-            close: function(event, ui) {
+            close: function (event, ui) {
                 $('#helpDialog').removeClass('small');
                 $('.ui-widget-overlay').removeClass("dim-overlay");
             }
         })
-          .parent()
-          .draggable();
+            .parent()
+            .draggable();
 
         $('#helpDialog').dialog("open");
 
-        $('#helpDialog-close').on("click", function() {
+        $('#helpDialog-close').on("click", function () {
             $('#helpDialog').dialog("close");
         });
     });
